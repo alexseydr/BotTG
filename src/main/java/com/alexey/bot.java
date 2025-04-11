@@ -25,12 +25,12 @@ public String getBotToken() {
         SendMessage message1 = new SendMessage();
         message1.setChatId(ChatId);
         message1.setText(message);
-        try{
-            execute(message1);
-        }
-        catch (TelegramApiException e){
-            e.printStackTrace();
-        }
+        //try{
+            // execute(message1); // отвечает моим же сообщением
+       // }
+        //catch (TelegramApiException e){
+        //    e.printStackTrace();
+        //}
     }
 
 }
