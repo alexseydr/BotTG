@@ -1,11 +1,10 @@
 package com.alexey.service;
+import com.alexey.models.Word;
 import com.alexey.repository.WordRepository;
 
-import com.alexey.models.word;
-import com.alexey.repository.WordRepository;
+import com.alexey.models.Word;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,17 +20,17 @@ public class WordService {
     }
 
     //Получаем все слова
-    public List<word> GetAllWords() {
+    public List<Word> GetAllWords() {
     return wordRepository.findAll();
     }
 
     //Получаем слово по его Id
-    public Optional<word> GetWordById(Long id) {
+    public Optional<Word> GetWordById(Long id) {
     return wordRepository.findById(id);
     }
 
     //Сохранить слово
-    public word SaveWord(word word) {
+    public Word SaveWord(Word word) {
         return wordRepository.save(word);
     }
 

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "word")
-public class word {
+public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // ID будет уникальным для каждого слова
@@ -14,11 +14,11 @@ public class word {
     private String translation;  // Перевод
 
     // Конструктор без параметров
-    public word() {
+    public Word() {
     }
 
     // Конструктор с параметрами
-    public word(Long id, String word, String translation) {
+    public Word(Long id, String word, String translation) {
         this.id = id;
         this.word = word;
         this.translation = translation;
