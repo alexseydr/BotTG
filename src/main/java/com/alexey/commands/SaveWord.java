@@ -29,7 +29,7 @@ public class SaveWord implements commandGeneral {
         if(words.length == 3) {
             String word = words[1];
             String translation = words[2];
-            wordService.SaveWord(new word(null, word, translation));
+            wordService.SaveWord(new word(null, "word", "translation"));
             SendMessage msg = new SendMessage();
             msg.setChatId(update.getMessage().getChatId());
             msg.setText("Слово: "+word+ "+ и перевод:" +translation + " сохранены");

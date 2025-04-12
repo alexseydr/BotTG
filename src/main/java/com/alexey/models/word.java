@@ -1,11 +1,13 @@
 package com.alexey.models;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "word")
 public class word {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // ID будет уникальным для каждого слова
 
     private String word;  // Слово

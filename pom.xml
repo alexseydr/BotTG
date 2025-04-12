@@ -22,18 +22,14 @@
       <version>6.8.0</version>
     </dependency>
 
-    <!-- Зависимость для логирования Logback -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.6</version>
-    </dependency>
+
+
 
     <!-- Spring Boot Starter Data JPA -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
-      <version>2.5.0</version>
+      <version>3.1.5</version>
     </dependency>
 
     <!-- Hybernate-->
@@ -42,11 +38,17 @@
       <artifactId>hibernate-core</artifactId>
       <version>5.4.30.Final</version>
     </dependency>
+    <!-- Hybernate validator-->
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>8.0.1.Final</version>
+    </dependency>
     <!-- PostgreSQL -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.7.1</version>
+      <version>42.6.0</version>
     </dependency>
 
     <!-- Spring Boot Starter Web -->
@@ -59,7 +61,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.5.0</version> <!-- Используй актуальную версию -->
+    <version>3.1.5</version> <!-- Используй актуальную версию -->
   </parent>
 
 

@@ -5,6 +5,7 @@ import com.alexey.models.word;
 import com.alexey.repository.WordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +32,9 @@ public class WordService {
 
     //Сохранить слово
     public word SaveWord(word word) {
-    return wordRepository.save(word);
+        return wordRepository.save(word);
     }
+
 
     //Удалить слово по Id
     public void DeleteWord(Long id) {
