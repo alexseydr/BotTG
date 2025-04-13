@@ -31,9 +31,6 @@ private final WordService wordService;
     public Word SaveWord (@RequestBody Word word) {
     return wordService.SaveWord(word);
 }
-@DeleteMapping
-    public void DeleteWord (@PathVariable long id) {
-    wordService.DeleteWord(id);
-}
+
 
 }

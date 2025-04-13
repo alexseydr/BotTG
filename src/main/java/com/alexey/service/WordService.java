@@ -14,19 +14,19 @@ import java.util.Optional;
 public class WordService {
     private final WordRepository wordRepository;
 
-@Autowired
+    @Autowired
     public WordService(WordRepository wordRepository) {
         this.wordRepository = wordRepository;
     }
 
     //Получаем все слова
     public List<Word> GetAllWords() {
-    return wordRepository.findAll();
+        return wordRepository.findAll();
     }
 
     //Получаем слово по его Id
     public Optional<Word> GetWordById(Long id) {
-    return wordRepository.findById(id);
+        return wordRepository.findById(id);
     }
 
     //Сохранить слово
@@ -36,8 +36,10 @@ public class WordService {
 
 
     //Удалить слово по Id
-    public void DeleteWord(Long id) {
-    wordRepository.deleteById(id);
-    }
+    public void DeleteWord(String word, String translation) {
+        if (wordRepository.findByWordAndTranslation(word, translation).isPresent()) {
+            wordRepository.findByWordAndTranslation(word, translation).ifPresent(wordRepository::delete);
+        }
 
+    }
 }
