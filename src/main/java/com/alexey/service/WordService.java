@@ -31,7 +31,7 @@ public class WordService {
 
     //Сохранить слово
     public Word SaveWord(Word word) {
-        return wordRepository.save(word);
+            return wordRepository.save(word);
     }
 
 

@@ -57,6 +57,7 @@ public class Bot extends TelegramLongPollingBot {
             if(message.startsWith("/delete")) {
                 try {
                     SendMessage response = deleteWord.DeleteWord(message,ChatId);
+                    execute(response);
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }

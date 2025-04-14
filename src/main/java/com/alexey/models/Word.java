@@ -4,7 +4,7 @@ package com.alexey.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "word")
+@Table(name = "word", uniqueConstraints = {@UniqueConstraint(columnNames = {"word","translation"})})
 public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

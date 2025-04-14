@@ -1,6 +1,7 @@
 package com.alexey.commands;
 
 import com.alexey.models.Word;
+import com.alexey.repository.WordRepository;
 import com.alexey.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,27 +20,39 @@ public class SaveWord {
     @Autowired
     private WordService wordService;
     private Bot bot;
+    @Autowired
+    private WordRepository wordRepository;
 
     public SendMessage saveWord(String message, Long ChatId ) throws TelegramApiException {
 
         String[] words = message.split(" ", 3);
         SendMessage sendMessage = new SendMessage();
+
+        if(wordRepository.existsByWordAndTranslation(words[1], words[2])) { // Если в БД существует уже пара слово-перевод
         sendMessage.setChatId(ChatId);
-        if(words.length == 3) { // Идет проверка, что клиент разделил на 3 части запрос
-
-            wordService.SaveWord(new Word(null, words[1], words[2])); // айди(авто, слово, перевод)
-            sendMessage.setChatId(ChatId); // Определяет айди чата
-            sendMessage.setText(words[1]); // Устанавливает текст в чате
-            return sendMessage;
+        sendMessage.setText("Такая пара слово-перевод уже существует");
+        return sendMessage;
 
         }
-        else{ // Клиент не разделил на 3 части запрос
+        else{ // Если в БД не существует пара слово-перевод
 
-            sendMessage.setChatId(ChatId);
-            sendMessage.setText("Введите команду по примеру: Команда слово перевод :: /save dog собака");
-            return sendMessage;
+            if(words.length == 3) { // Идет проверка, что клиент разделил на 3 части запрос
+                wordService.SaveWord(new Word(null, words[1], words[2])); // сохранение айди(автоинкремент, слово, перевод)
+                sendMessage.setChatId(ChatId); // Определяет айди чата
+                sendMessage.setText("Пара "+words[1]+" "+words[2]+" сохранена в словарь!"); // Устанавливает текст в чате
+                return sendMessage;
 
+            }
+            else{ // Клиент не разделил на 3 части запрос
+
+                sendMessage.setChatId(ChatId);
+                sendMessage.setText("Введите команду по примеру: Команда слово перевод :: /save dog собака");
+                return sendMessage;
+
+            }
         }
+
+
 
 
     }
