@@ -2,16 +2,13 @@ package com.alexey;
 
 import com.alexey.commands.DeleteWord;
 import com.alexey.commands.SaveWord;
-import com.alexey.models.Word;
 import com.alexey.repository.WordRepository;
 import com.alexey.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import org.springframework.stereotype.Component;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -43,11 +40,14 @@ public class Bot extends TelegramLongPollingBot {
         if(update.hasMessage() && update.getMessage().hasText()){
             String message = update.getMessage().getText();
             long ChatId = update.getMessage().getChatId();
+            String UserId = update.getMessage().getChatId().toString();
             SendMessage sendMessage = new SendMessage();
 
-            if(message.startsWith("/save")) {
+            if(message.startsWith("/save")) {// Действие при команде /save
+
                 try {
-                    SendMessage response = saveWord.saveWord(message, ChatId);
+
+                    SendMessage response = saveWord.saveWord(message, ChatId,UserId);
                     execute(response); // ОТПРАВЛЯЕТ
 
                 } catch (Exception e) {
@@ -61,6 +61,12 @@ public class Bot extends TelegramLongPollingBot {
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }
+            }
+            if(message.startsWith("/test")){
+                try{
+                    wordRepository.updateAllDelayBetween();
+                }
+                catch (Exception e){}
             }
 
 

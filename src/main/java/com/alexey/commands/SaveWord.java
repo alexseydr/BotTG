@@ -8,12 +8,11 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
+
 
 import com.alexey.Bot;
+
+import java.time.LocalDate;
 
 @Component
 public class SaveWord {
@@ -23,10 +22,11 @@ public class SaveWord {
     @Autowired
     private WordRepository wordRepository;
 
-    public SendMessage saveWord(String message, Long ChatId ) throws TelegramApiException {
+    public SendMessage saveWord(String message, Long ChatId, String UserId ) throws TelegramApiException {
 
         String[] words = message.split(" ", 3);
         SendMessage sendMessage = new SendMessage();
+        LocalDate date = LocalDate.now();
 
         if(wordRepository.existsByWordAndTranslation(words[1], words[2])) { // Если в БД существует уже пара слово-перевод
         sendMessage.setChatId(ChatId);
@@ -37,7 +37,7 @@ public class SaveWord {
         else{ // Если в БД не существует пара слово-перевод
 
             if(words.length == 3) { // Идет проверка, что клиент разделил на 3 части запрос
-                wordService.SaveWord(new Word(null, words[1], words[2])); // сохранение айди(автоинкремент, слово, перевод)
+                wordService.SaveWord(new Word(null, words[1], words[2], date, null,UserId)); // сохранение айди(автоинкремент, слово, перевод)
                 sendMessage.setChatId(ChatId); // Определяет айди чата
                 sendMessage.setText("Пара "+words[1]+" "+words[2]+" сохранена в словарь!"); // Устанавливает текст в чате
                 return sendMessage;

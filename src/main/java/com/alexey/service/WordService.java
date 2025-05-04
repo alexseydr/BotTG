@@ -1,11 +1,8 @@
 package com.alexey.service;
 import com.alexey.models.Word;
 import com.alexey.repository.WordRepository;
-
-import com.alexey.models.Word;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +13,7 @@ public class WordService {
 
     @Autowired
     public WordService(WordRepository wordRepository) {
+
         this.wordRepository = wordRepository;
     }
 
