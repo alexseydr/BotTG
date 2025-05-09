@@ -6,6 +6,7 @@ import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import com.alexey.MessageSender.Schedule;
 
 @Component
 public class Sender extends DefaultAbsSender {
