@@ -31,7 +31,9 @@ public class Bot extends TelegramLongPollingBot {
     private DeleteWord deleteWord;
     @Autowired
             private ServiceSend serviceSend;
-    Dotenv dotenv = Dotenv.load();
+
+    Dotenv dotenv = Dotenv.configure().directory("C:\\Users\\amals\\IdeaProjects\\BotTG1").load();
+
 
 
     @Override
@@ -52,7 +54,6 @@ public class Bot extends TelegramLongPollingBot {
             long ChatId = update.getMessage().getChatId();
             String UserId = update.getMessage().getChatId().toString();
             SendMessage sendMessage = new SendMessage();
-
             if(message.startsWith("/save")) {// Действие при команде /save
 
                 try {

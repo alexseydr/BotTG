@@ -17,8 +17,7 @@ public class Schedule {
         this.wordRepository = wordRepository;
     }
 
-    //@Scheduled(cron = "0 0 6 * * *") // выполняется каждый день в 6:00
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 0 6 * * *") // выполняется каждый день в 6:00
     public void Scheduling() {
         wordRepository.updateAllDelayBetween(); // Обновление значений delayBetween
         Map<Long, List<String>> messages = MessagingQueue(); // Получаем сообщения для пользователей

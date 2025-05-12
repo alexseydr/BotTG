@@ -22,23 +22,22 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     @Transactional
     @Query(value = "UPDATE word SET delay_between = CURRENT_DATE - date_time", nativeQuery = true)
     void updateAllDelayBetween();
-
+    @Transactional
     @Query(value = "SELECT  w.translation FROM Word w WHERE CAST(w.user_id AS bigint) = :user_id", nativeQuery = true)
     List <String> getTranslationsByUserId(@Param("user_id") Long userId);
-
+    @Transactional
     @Query(value = "SELECT  w.translation FROM Word w WHERE CAST(w.user_id AS bigint) = :user_id LIMIT 1", nativeQuery = true)
     String getTranslationByUserId(@Param("user_id") Long userId);
-
+    @Transactional
     @Query(value = "SELECT w.translation FROM Word w WHERE CAST(w.user_id AS bigint) = :user_id AND w.word != :word LIMIT 1", nativeQuery = true)
     String getTranslationsExcludingWord(@Param("user_id") Long userId, @Param("word") String word);
-
+    @Transactional
     @Query(value = "SELECT w.translation FROM Word w WHERE CAST(w.user_id AS bigint) = :user_id AND w.word = :word LIMIT 1", nativeQuery = true)
     String getTranslationByUserIdAndWord(@Param("user_id") Long userId, @Param("word") String word);
-
-
-
-    @Query("SELECT w.word FROM Word w WHERE w.UserId = :userId AND w.DelayBetween IN (0,1, 3, 7)")
+    @Transactional
+    @Query("SELECT w.word FROM Word w WHERE w.UserId = :userId AND w.DelayBetween IN (1, 3, 7,9,14,21,30)")
     List<String> getWordsByUserIdAndDelayBetween(@Param("userId") String userId);
+    @Transactional
     @Query("SELECT w.UserId FROM Word w")
     List<Long> getAllUserId();
 

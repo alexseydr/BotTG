@@ -63,7 +63,7 @@ public class ServiceSend {
     }
 
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 10 * * *")
     public void sendDailyMessage() {
         Map<Long, List<String>> messages = schedule.MessagingQueue();
         for (Map.Entry<Long, List<String>> entry : messages.entrySet()) {
@@ -75,11 +75,16 @@ public class ServiceSend {
             for (int i = 0; i < userMessage.size(); i++) {
                 List<String> AllIncorrectTranslation = new ArrayList<>(AllTranslation); // копия
                 Collections.shuffle(AllIncorrectTranslation);
-                List<String> SelectedIncorrectTranslation = AllIncorrectTranslation.subList(0, 3);
                 String correctAnswer = wordRepository.getTranslationByUserIdAndWord(userId, userMessage.get(i));
+                try{
+                    AllIncorrectTranslation.remove(correctAnswer);
+                }
+                catch (Exception e){
+
+                }
+                List<String> SelectedIncorrectTranslation = AllIncorrectTranslation.subList(0, 3);
                 SelectedIncorrectTranslation.add(correctAnswer);
                 Collections.shuffle(SelectedIncorrectTranslation);
-
                 List<InlineKeyboardButton> buttons = new ArrayList<>();
                 for (String Answer : SelectedIncorrectTranslation) {
                     InlineKeyboardButton button = new InlineKeyboardButton(Answer);

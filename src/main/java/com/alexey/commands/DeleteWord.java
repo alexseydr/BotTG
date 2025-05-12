@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import com.alexey.Bot;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Component
 public class DeleteWord {
     @Autowired
@@ -17,39 +20,38 @@ public class DeleteWord {
     private WordRepository wordRepository;
     private Bot bot;
 
-public SendMessage DeleteWord(String message, Long ChatId) throws TelegramApiException {
+    public SendMessage DeleteWord(String message, Long chatId) throws TelegramApiException {
 
-    String[] words = message.split(" ", 3);
-    SendMessage sendMessage = new SendMessage();
-    String word = words[1];
-    String translation = words[2];
-    if(wordRepository.existsByWordAndTranslation(word, translation)) {
-        if(words.length == 3) { // Идет проверка, что клиент разделил на 3 части запрос
+        // Регулярное выражение для поиска строк в кавычках
+        Pattern pattern = Pattern.compile("\"([^\"]+)\""); // Это ищет текст в кавычках
+        Matcher matcher = pattern.matcher(message);
 
-            wordService.DeleteWord(word,translation); // Удаляет слово по конструкции "слово-перевод"
-            sendMessage.setChatId(ChatId);
-            sendMessage.setText("Пара: "+word+"-"+translation+" удалена!");
-            return sendMessage;
+        SendMessage sendMessage = new SendMessage();
 
+        // Проверяем, что в сообщении есть две строки в кавычках
+        if (matcher.find()) {
+            String wordText = matcher.group(1);  // Первая строка в кавычках - слово
+            if (matcher.find()) {
+                String translationText = matcher.group(1);  // Вторая строка в кавычках - перевод
 
+                // Проверяем, существует ли такая пара слово-перевод в базе
+                if (wordRepository.existsByWordAndTranslation(wordText, translationText)) {
+                    // Удаляем пару слово-перевод
+                    wordService.DeleteWord(wordText, translationText);
+                    sendMessage.setChatId(chatId);
+                    sendMessage.setText("Пара: \"" + wordText + "\" - \"" + translationText + "\" удалена!");
+                    return sendMessage;
+                } else {
+                    sendMessage.setChatId(chatId);
+                    sendMessage.setText("Такой пары слово-перевод не существует! Возможно, она была удалена ранее.");
+                    return sendMessage;
+                }
+            }
         }
-        else{ // Клиент не разделил на 3 части запрос
 
-            sendMessage.setChatId(ChatId);
-            sendMessage.setText("Введите пару для удаления /delete dog - собака");
-            return sendMessage;
-
-        }
-    }
-    else{
-        sendMessage.setChatId(ChatId);
-        sendMessage.setText("Такой пары слово-перевод не существует! Возможно, она была удалена ранее");
+        // Если не найдены две строки в кавычках
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите команду по примеру: /delete \"слово\" \"перевод\"");
         return sendMessage;
     }
-
-
-
-
-}
-
 }

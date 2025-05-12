@@ -6,13 +6,12 @@ import com.alexey.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-
 import com.alexey.Bot;
 
 import java.time.LocalDate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class SaveWord {
@@ -22,38 +21,39 @@ public class SaveWord {
     @Autowired
     private WordRepository wordRepository;
 
-    public SendMessage saveWord(String message, Long ChatId, String UserId ) throws TelegramApiException {
+    public SendMessage saveWord(String message, Long chatId, String userId) throws TelegramApiException {
 
-        String[] words = message.split(" ", 3);
+        // Регулярное выражение для поиска строк в кавычках
+        Pattern pattern = Pattern.compile("\"([^\"]+)\""); // Это ищет текст в кавычках
+        Matcher matcher = pattern.matcher(message);
+
         SendMessage sendMessage = new SendMessage();
         LocalDate date = LocalDate.now();
 
-        if(wordRepository.existsByWordAndTranslation(words[1], words[2])) { // Если в БД существует уже пара слово-перевод
-        sendMessage.setChatId(ChatId);
-        sendMessage.setText("Такая пара слово-перевод уже существует");
+        // Проверяем, что в сообщении есть две строки в кавычках
+        if (matcher.find()) {
+            String wordText = matcher.group(1);  // Первая строка в кавычках - слово
+            if (matcher.find()) {
+                String translationText = matcher.group(1);  // Вторая строка в кавычках - перевод
+
+                // Проверяем, существует ли такая пара слово-перевод в базе
+                if (wordRepository.existsByWordAndTranslation(wordText, translationText)) {
+                    sendMessage.setChatId(chatId);
+                    sendMessage.setText("Такая пара слово-перевод уже существует");
+                    return sendMessage;
+                } else {
+                    // Сохраняем новое слово с переводом
+                    wordService.SaveWord(new Word(null, wordText, translationText, date, null, userId));
+                    sendMessage.setChatId(chatId);
+                    sendMessage.setText("Пара \"" + wordText + "\" - \"" + translationText + "\" сохранена в словарь!");
+                    return sendMessage;
+                }
+            }
+        }
+
+        // Если не найдены две строки в кавычках
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите команду по примеру: /save \"слово\" \"перевод\"");
         return sendMessage;
-
-        }
-        else{ // Если в БД не существует пара слово-перевод
-
-            if(words.length == 3) { // Идет проверка, что клиент разделил на 3 части запрос
-                wordService.SaveWord(new Word(null, words[1], words[2], date, null,UserId)); // сохранение айди(автоинкремент, слово, перевод)
-                sendMessage.setChatId(ChatId); // Определяет айди чата
-                sendMessage.setText("Пара "+words[1]+" "+words[2]+" сохранена в словарь!"); // Устанавливает текст в чате
-                return sendMessage;
-
-            }
-            else{ // Клиент не разделил на 3 части запрос
-
-                sendMessage.setChatId(ChatId);
-                sendMessage.setText("Введите команду по примеру: Команда слово перевод :: /save dog собака");
-                return sendMessage;
-
-            }
-        }
-
-
-
-
     }
 }
