@@ -1,5 +1,6 @@
 package com.alexey;
 
+import com.alexey.MessageSender.ServiceSend;
 import com.alexey.commands.DeleteWord;
 import com.alexey.commands.SaveWord;
 import com.alexey.repository.WordRepository;
@@ -8,9 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.springframework.stereotype.Component;
 import io.github.cdimascio.dotenv.Dotenv;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Component
@@ -23,6 +29,8 @@ public class Bot extends TelegramLongPollingBot {
     private SaveWord saveWord;
     @Autowired
     private DeleteWord deleteWord;
+    @Autowired
+            private ServiceSend serviceSend;
     Dotenv dotenv = Dotenv.load();
 
 
@@ -36,7 +44,9 @@ public class Bot extends TelegramLongPollingBot {
     }
     @Override
     public void onUpdateReceived(Update update) {
-
+        if (update.hasCallbackQuery()) {
+            serviceSend.getCallbackResponse(update.getCallbackQuery());
+        }
         if(update.hasMessage() && update.getMessage().hasText()){
             String message = update.getMessage().getText();
             long ChatId = update.getMessage().getChatId();

@@ -5,17 +5,19 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.alexey.MessageSender.Schedule;
 
 @Component
 public class Sender extends DefaultAbsSender {
 
     private final String botToken;
 
+
     public Sender() {
         super(new DefaultBotOptions());
-        this.botToken = Dotenv.load().get("BOT_TOKEN");  // Из .env файла
+        this.botToken = Dotenv.load().get("BOT_TOKEN");// Из .env файла
     }
 
     @Override
@@ -23,8 +25,14 @@ public class Sender extends DefaultAbsSender {
         return botToken;
     }
 
-    // Метод для отправки сообщений
+    // Метод для отправки новых сообщений
     public void send(SendMessage message) throws TelegramApiException {
+        execute(message);
+    }
+
+
+    // Метод для редактирования уже отправленных сообщений
+    public void edit(EditMessageText message) throws TelegramApiException {
         execute(message);
     }
 }

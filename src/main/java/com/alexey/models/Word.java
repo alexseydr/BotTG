@@ -19,6 +19,7 @@ public class Word {
     private String word;  // Слово
     private String translation;  // Перевод
     private Integer DelayBetween; // Время в днях от добавления до нынешней даты для установления расписания повторения 1,3,7,14 дней
+    @Column(name = "user_id")
     private String UserId;
     // Конструктор без параметров
     public Word() {

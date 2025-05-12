@@ -21,25 +21,18 @@ public class Schedule {
     @Scheduled(cron = "*/10 * * * * *")
     public void Scheduling() {
         wordRepository.updateAllDelayBetween(); // Обновление значений delayBetween
-        Map<Long, String> messages = MessagingQueue(); // Получаем сообщения для пользователей
+        Map<Long, List<String>> messages = MessagingQueue(); // Получаем сообщения для пользователей
 
     }
 
-    public Map<Long, String> MessagingQueue() {
+    public Map<Long, List<String>> MessagingQueue() {
         List<Long> userIds = wordRepository.getAllUserId(); // Получаем всех пользователей
-        Map<Long, String> messageMap = new HashMap<>();
+        Map<Long, List<String>> messageMap = new HashMap<>();
 
         for (Long userId : userIds) {
             // Получаем слова и переводы для каждого пользователя
             List<String> words = wordRepository.getWordsByUserIdAndDelayBetween(String.valueOf(userId));
-            List<String> translations = wordRepository.getTranslationsByUserId(String.valueOf(userId));
-
-            StringBuilder message = new StringBuilder();
-            for (int i = 0; i < words.size(); i++) {
-                message.append(words.get(i)).append(" - ").append(translations.get(i)).append("\n");
-            }
-
-            messageMap.put(userId, message.toString());
+            messageMap.put(userId,words);
         }
 
         return messageMap;
