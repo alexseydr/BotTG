@@ -46,9 +46,9 @@ public class WordService {
 
 
     //Удалить слово по Id
-    public void DeleteWord(String word, String translation) {
-        if (wordRepository.findByWordAndTranslation(word, translation).isPresent()) {
-            wordRepository.findByWordAndTranslation(word, translation).ifPresent(wordRepository::delete);
+    public void DeleteWord(String word, String translation,String chatId) {
+        if (wordRepository.findByWordAndTranslationAndUserId(word, translation,chatId).isPresent()) {
+            wordRepository.findByWordAndTranslationAndUserId(word, translation,chatId).ifPresent(wordRepository::delete);
         }
 
     }

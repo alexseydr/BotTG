@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
-    Optional<Word> findByWordAndTranslation(String word, String translation);
+    Optional<Word> findByWordAndTranslationAndUserId(String word, String translation,String userId);
     boolean existsByWordAndTranslationAndUserId(String word, String translation, String UserId);
     @Modifying
     @Transactional

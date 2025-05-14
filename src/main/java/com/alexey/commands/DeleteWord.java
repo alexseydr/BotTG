@@ -36,7 +36,7 @@ public class DeleteWord {
                 // Проверяем, существует ли такая пара слово-перевод в базе
                 if (wordRepository.existsByWordAndTranslationAndUserId(wordText, translationText,String.valueOf(chatId))) {
                     // Удаляем пару слово-перевод
-                    wordService.DeleteWord(wordText, translationText);
+                    wordService.DeleteWord(wordText, translationText,String.valueOf(chatId));
                     sendMessage.setChatId(chatId);
                     sendMessage.setText("Пара: \"" + wordText + "\" - \"" + translationText + "\" удалена!");
                     return sendMessage;
