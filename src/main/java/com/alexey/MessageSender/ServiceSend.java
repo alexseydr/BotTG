@@ -66,7 +66,7 @@ public class ServiceSend {
     }
 
 
-    @Scheduled(cron = "0 30 6 * * *")
+    @Scheduled(cron = "0 30 11 * * *")
     public void sendDailyMessage() {
         Map<Long, List<String>> messages = schedule.MessagingQueue();
         for (Map.Entry<Long, List<String>> entry : messages.entrySet()) {
