@@ -99,7 +99,9 @@ public class ServiceSend {
                 }
 
                 List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-                keyboard.add(buttons);
+                for (InlineKeyboardButton button : buttons) {
+                    keyboard.add(Collections.singletonList(button));
+                }
                 InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
                 markup.setKeyboard(keyboard);
 
