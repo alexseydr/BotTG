@@ -4,6 +4,7 @@ import com.alexey.MessageSender.ServiceSend;
 import com.alexey.commands.DeleteWord;
 import com.alexey.commands.ListWord;
 import com.alexey.commands.SaveWord;
+import com.alexey.models.Word;
 import com.alexey.repository.WordRepository;
 import com.alexey.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.springframework.stereotype.Component;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.time.LocalDate;
 
 
 @Component
@@ -30,7 +32,8 @@ public class Bot extends TelegramLongPollingBot {
             private ListWord listWord;
 
     Dotenv dotenv = Dotenv.configure().directory("C:\\Users\\amals\\IdeaProjects\\BotTG1").load();
-
+    @Autowired
+    private WordService wordService;
 
 
     @Override
@@ -56,21 +59,25 @@ public class Bot extends TelegramLongPollingBot {
             if(message.startsWith("/start")){
             SendMessage startMessage = new SendMessage();
             startMessage.setChatId(ChatId);
-            startMessage.setText("Привет! \uD83D\uDC4B\n" +
+                startMessage.setText("Привет! \uD83D\uDC4B\n" +
                     "\n" +
                     "Рад приветствовать тебя в нашем учебном боте по изучению иностранных слов! ✨\n" +
                     "\n" +
                     "Перед началом занятий ознакомься с простыми правилами:\n" +
                     "\n" +
-                    "✅ Краткость — сестра таланта!Лучше избегать длинных предложений, так как они могут обрезаться. Например, фразу \"Hello, my name is...\" рекомендуем сократить до простого \"Hello\". Так обучение пройдёт эффективнее и без сбоев.\n" +
+                    "✅ Краткость — сестра таланта! Лучше избегать длинных предложений, так как они могут обрезаться. Например, фразу \"Hello, my name is...\" рекомендуем сократить до простого \"Hello\". Так обучение пройдёт без сбоев.\n" +
                     "\n" +
                     "\uD83D\uDCCC Основные команды:\n" +
                     "\n" +
                     "/save \"слово\" \"перевод\" — добавляет новое слово в твой личный словарь.  \n" +
-                    "/delete \"слово\" \"перевод\" — удаляет слово из твоего словаря.\n");
+                    "/delete \"слово\" \"перевод\" — удаляет слово из твоего словаря.\n" +
+                        "/list - показывает ваш словарь.\n");
             try {
-
                 execute(startMessage);
+                wordService.SaveWord(new Word(null, "dog", "собака", LocalDate.now(), null, String.valueOf(ChatId)));
+                wordService.SaveWord(new Word(null, "journey", "путешествие", LocalDate.now(), null, String.valueOf(ChatId)));
+                wordService.SaveWord(new Word(null, "memory", "память", LocalDate.now(), null, String.valueOf(ChatId)));
+                wordService.SaveWord(new Word(null, "decision", "решение", LocalDate.now(), null, String.valueOf(ChatId)));
             }
             catch (TelegramApiException e) {
                 e.printStackTrace();

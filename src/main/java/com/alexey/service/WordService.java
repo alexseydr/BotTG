@@ -31,6 +31,9 @@ public class WordService {
     public Word SaveWord(Word word) {
             return wordRepository.save(word);
     }
+    public Word SaveWordById(Word word, String chatId) {
+        return wordRepository.save(word);
+    }
     public  void ListWord (String userId){
         wordRepository.getWordsAndTranslationsByUserId(userId);
     }
