@@ -74,10 +74,10 @@ public class Bot extends TelegramLongPollingBot {
                         "/list - показывает ваш словарь.\n");
             try {
                 execute(startMessage);
-                wordService.SaveWord(new Word(null, "dog", "собака", LocalDate.now(), null, String.valueOf(ChatId)));
-                wordService.SaveWord(new Word(null, "journey", "путешествие", LocalDate.now(), null, String.valueOf(ChatId)));
-                wordService.SaveWord(new Word(null, "memory", "память", LocalDate.now(), null, String.valueOf(ChatId)));
-                wordService.SaveWord(new Word(null, "decision", "решение", LocalDate.now(), null, String.valueOf(ChatId)));
+                wordService.SaveWord(new Word(null, "dog", "собака", LocalDate.now().minusDays(31), null, String.valueOf(ChatId)));
+                wordService.SaveWord(new Word(null, "journey", "путешествие", LocalDate.now().minusDays(31), null, String.valueOf(ChatId)));
+                wordService.SaveWord(new Word(null, "memory", "память", LocalDate.now().minusDays(31), null, String.valueOf(ChatId)));
+                wordService.SaveWord(new Word(null, "decision", "решение", LocalDate.now().minusDays(31), null, String.valueOf(ChatId)));
             }
             catch (TelegramApiException e) {
                 e.printStackTrace();
