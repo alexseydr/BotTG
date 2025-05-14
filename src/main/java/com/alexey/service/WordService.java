@@ -31,6 +31,15 @@ public class WordService {
     public Word SaveWord(Word word) {
             return wordRepository.save(word);
     }
+    public  void ListWord (String userId){
+        wordRepository.getWordsAndTranslationsByUserId(userId);
+    }
+    //Для сервиса в ServiceSend
+    //public List <String> getTranslationsByUserId(Long userId){
+      //  wordRepository.getWordsAndTranslationsByUserId(String.valueOf(userId));
+        //return getTranslationsByUserId(userId);
+    //}
+
 
 
     //Удалить слово по Id

@@ -1,6 +1,7 @@
 package com.alexey.MessageSender;
 
 import com.alexey.repository.WordRepository;
+import com.alexey.service.WordService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -18,11 +19,13 @@ public class ServiceSend {
     private final Sender sender;
     private final Schedule schedule;
     private WordRepository wordRepository;
+    private WordService wordService;
 
-    public ServiceSend(Sender sender, Schedule schedule, WordRepository wordRepository) {
+    public ServiceSend(Sender sender, Schedule schedule, WordRepository wordRepository, WordService wordService) {
         this.sender = sender;
         this.schedule = schedule;
         this.wordRepository = wordRepository;
+        this.wordService = wordService;
     }
 
     public void getCallbackResponse(CallbackQuery callbackQuery) {
@@ -63,17 +66,16 @@ public class ServiceSend {
     }
 
 
-    @Scheduled(cron = "0 0 10 * * *")
+    @Scheduled(cron = "0 30 6 * * *")
     public void sendDailyMessage() {
         Map<Long, List<String>> messages = schedule.MessagingQueue();
         for (Map.Entry<Long, List<String>> entry : messages.entrySet()) {
             Long userId = entry.getKey();
             List<String> userMessage = entry.getValue();
-            List<String> AllTranslation;
-            AllTranslation= wordRepository.getTranslationsByUserId(userId);
+            List<String> allTranslations = wordRepository.getTranslationsByUserId(userId);
 
             for (int i = 0; i < userMessage.size(); i++) {
-                List<String> AllIncorrectTranslation = new ArrayList<>(AllTranslation); // копия
+                List<String> AllIncorrectTranslation = new ArrayList<>(allTranslations); // копия
                 Collections.shuffle(AllIncorrectTranslation);
                 String correctAnswer = wordRepository.getTranslationByUserIdAndWord(userId, userMessage.get(i));
                 try{

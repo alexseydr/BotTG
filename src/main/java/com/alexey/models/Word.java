@@ -10,7 +10,7 @@ import java.time.Period;
 import java.time.temporal.ChronoUnit;
 
 @Entity
-@Table(name = "word", uniqueConstraints = {@UniqueConstraint(columnNames = {"word","translation"})})
+@Table(name = "word")
 public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,19 +20,19 @@ public class Word {
     private String translation;  // Перевод
     private Integer DelayBetween; // Время в днях от добавления до нынешней даты для установления расписания повторения 1,3,7,14 дней
     @Column(name = "user_id")
-    private String UserId;
+    private String userId;
     // Конструктор без параметров
     public Word() {
     }
 
     // Конструктор с параметрами
-    public Word(Long id, String word, String translation,LocalDate dateTime, Integer DelayBetween,String UserId) {
+    public Word(Long id, String word, String translation,LocalDate dateTime, Integer DelayBetween,String userId) {
         this.id = id;
         this.word = word;
         this.translation = translation;
         this.DelayBetween = DelayBetween;
         this.dateTime = dateTime;
-        this.UserId = UserId;
+        this.userId = userId;
 
     }
 
@@ -65,6 +65,6 @@ public class Word {
     }
 
     public String getUserId() {
-        return UserId;
+        return userId;
     }
 }

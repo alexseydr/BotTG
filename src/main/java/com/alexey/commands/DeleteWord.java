@@ -2,7 +2,6 @@ package com.alexey.commands;
 
 import com.alexey.repository.WordRepository;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.alexey.models.Word;
 import com.alexey.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,8 +21,8 @@ public class DeleteWord {
 
     public SendMessage DeleteWord(String message, Long chatId) throws TelegramApiException {
 
-        // Регулярное выражение для поиска строк в кавычках
-        Pattern pattern = Pattern.compile("\"([^\"]+)\""); // Это ищет текст в кавычках
+
+        Pattern pattern = Pattern.compile("\"([^\"]+)\"");
         Matcher matcher = pattern.matcher(message);
 
         SendMessage sendMessage = new SendMessage();
@@ -35,7 +34,7 @@ public class DeleteWord {
                 String translationText = matcher.group(1);  // Вторая строка в кавычках - перевод
 
                 // Проверяем, существует ли такая пара слово-перевод в базе
-                if (wordRepository.existsByWordAndTranslation(wordText, translationText)) {
+                if (wordRepository.existsByWordAndTranslationAndUserId(wordText, translationText,String.valueOf(chatId))) {
                     // Удаляем пару слово-перевод
                     wordService.DeleteWord(wordText, translationText);
                     sendMessage.setChatId(chatId);

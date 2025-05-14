@@ -37,7 +37,7 @@ public class SaveWord {
                 String translationText = matcher.group(1);  // Вторая строка в кавычках - перевод
 
                 // Проверяем, существует ли такая пара слово-перевод в базе
-                if (wordRepository.existsByWordAndTranslation(wordText, translationText)) {
+                if (wordRepository.existsByWordAndTranslationAndUserId(wordText, translationText, String.valueOf(chatId))) {
                     sendMessage.setChatId(chatId);
                     sendMessage.setText("Такая пара слово-перевод уже существует");
                     return sendMessage;

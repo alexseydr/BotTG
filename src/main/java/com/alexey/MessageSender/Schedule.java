@@ -1,10 +1,7 @@
 package com.alexey.MessageSender;
-import com.alexey.models.Word;
 import com.alexey.repository.WordRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +14,8 @@ public class Schedule {
         this.wordRepository = wordRepository;
     }
 
-    @Scheduled(cron = "0 0 6 * * *") // выполняется каждый день в 6:00
+    @Scheduled(cron = "0 30 6 * * *") // выполняется каждый день в 6:00
+
     public void Scheduling() {
         wordRepository.updateAllDelayBetween(); // Обновление значений delayBetween
         Map<Long, List<String>> messages = MessagingQueue(); // Получаем сообщения для пользователей

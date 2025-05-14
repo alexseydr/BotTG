@@ -2,21 +2,18 @@ package com.alexey;
 
 import com.alexey.MessageSender.ServiceSend;
 import com.alexey.commands.DeleteWord;
+import com.alexey.commands.ListWord;
 import com.alexey.commands.SaveWord;
 import com.alexey.repository.WordRepository;
 import com.alexey.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.Update;;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.springframework.stereotype.Component;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Component
@@ -24,13 +21,13 @@ public class Bot extends TelegramLongPollingBot {
     @Autowired
     private WordRepository wordRepository;
     @Autowired
-    private  WordService wordService;
-    @Autowired
     private SaveWord saveWord;
     @Autowired
     private DeleteWord deleteWord;
     @Autowired
             private ServiceSend serviceSend;
+    @Autowired
+            private ListWord listWord;
 
     Dotenv dotenv = Dotenv.configure().directory("C:\\Users\\amals\\IdeaProjects\\BotTG1").load();
 
@@ -50,10 +47,35 @@ public class Bot extends TelegramLongPollingBot {
             serviceSend.getCallbackResponse(update.getCallbackQuery());
         }
         if(update.hasMessage() && update.getMessage().hasText()){
+
             String message = update.getMessage().getText();
             long ChatId = update.getMessage().getChatId();
             String UserId = update.getMessage().getChatId().toString();
             SendMessage sendMessage = new SendMessage();
+
+            if(message.startsWith("/start")){
+            SendMessage startMessage = new SendMessage();
+            startMessage.setChatId(ChatId);
+            startMessage.setText("Привет! \uD83D\uDC4B\n" +
+                    "\n" +
+                    "Рад приветствовать тебя в нашем учебном боте по изучению иностранных слов! ✨\n" +
+                    "\n" +
+                    "Перед началом занятий ознакомься с простыми правилами:\n" +
+                    "\n" +
+                    "✅ Краткость — сестра таланта!Лучше избегать длинных предложений, так как они могут обрезаться. Например, фразу \"Hello, my name is...\" рекомендуем сократить до простого \"Hello\". Так обучение пройдёт эффективнее и без сбоев.\n" +
+                    "\n" +
+                    "\uD83D\uDCCC Основные команды:\n" +
+                    "\n" +
+                    "/save \"слово\" \"перевод\" — добавляет новое слово в твой личный словарь.  \n" +
+                    "/delete \"слово\" \"перевод\" — удаляет слово из твоего словаря.\n");
+            try {
+
+                execute(startMessage);
+            }
+            catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+            }
             if(message.startsWith("/save")) {// Действие при команде /save
 
                 try {
@@ -73,15 +95,25 @@ public class Bot extends TelegramLongPollingBot {
                     throw new RuntimeException(e);
                 }
             }
-            if(message.startsWith("/test")){
+            if(message.startsWith("/test012345")){
                 try{
                     wordRepository.updateAllDelayBetween();
                 }
                 catch (Exception e){}
             }
+            if (message.startsWith("/list")) {
 
-
+                try {
+                    SendMessage responce = listWord.ListWords(String.valueOf(ChatId));
+                    execute(responce);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
             }
+
+
+
+        }
 
         }
 
