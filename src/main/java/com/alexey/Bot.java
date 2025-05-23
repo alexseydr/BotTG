@@ -1,5 +1,6 @@
 package com.alexey;
 
+import com.alexey.MessageSender.Schedule;
 import com.alexey.MessageSender.Sender;
 import com.alexey.MessageSender.ServiceSend;
 import com.alexey.commands.DeleteWord;
@@ -7,8 +8,10 @@ import com.alexey.commands.ListWord;
 import com.alexey.commands.SaveWord;
 import com.alexey.models.Word;
 import com.alexey.repository.WordRepository;
+import com.alexey.service.MakeSound;
 import com.alexey.service.WordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;;
@@ -16,14 +19,22 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.springframework.stereotype.Component;
-import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.File;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
+import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
+
 
 
 @Component
 public class Bot extends TelegramLongPollingBot {
+    @Value("${bot.token}")
+    private String botToken;
+    @Value("${bot.username}")
+    private String botUsername;
     @Autowired
     private WordRepository wordRepository;
     @Autowired
@@ -36,19 +47,24 @@ public class Bot extends TelegramLongPollingBot {
             private ListWord listWord;
     @Autowired
             private Sender sender;
+    @Autowired
+        private Schedule schedule;
+    @Autowired
+    private MakeSound makeSound;
 
-    Dotenv dotenv = Dotenv.configure().directory("C:\\Users\\amals\\IdeaProjects\\BotTG1").load();
+
+
     @Autowired
     private WordService wordService;
 
 
     @Override
     public String getBotUsername() {
-        return "LanguageSlayer";
+        return botUsername;
     }
     @Override
     public String getBotToken() {
-        return dotenv.get("BOT_TOKEN");
+        return botToken;
     }
     @Override
     public void onUpdateReceived(Update update) {
@@ -71,7 +87,7 @@ public class Bot extends TelegramLongPollingBot {
                     "\n" +
                     "Перед началом занятий ознакомься с простыми правилами:\n" +
                     "\n" +
-                    "❗❗ Краткость — сестра таланта! Лучше избегать длинных фраз или предложений, так как они могу плохо отображаться. Например, предложение \"The sky turned dark and heavy, but light still found a way in.\" является максимальным по количеству символов (62 символа, включая все знаки препинания, пробелы).  Так обучение пройдёт без сбоев.\n" +
+                    "❗❗ Краткость — сестра таланта! Лучше избегать длинных фраз или предложений, так как они могу плохо отображаться. Например, предложение \"The sky turned dark and heavy, but light still found a way in.\" является максимальным по количеству символов (62 символа, включая все знаки препинания, пробелы.  Так обучение пройдёт без сбоев.\n" +
                     "\n" +
                     "\uD83D\uDCCC Основные команды:\n" +
                     "\n" +
@@ -79,6 +95,7 @@ public class Bot extends TelegramLongPollingBot {
                     "/delete \"слово\" \"перевод\" — удаляет слово из твоего словаря.\n" +
                         "/list - показывает ваш словарь.\n");
             try {
+
                 execute(startMessage);
                 wordService.SaveWord(new Word(null, "dog", "собака", LocalDate.now().minusDays(31), null, String.valueOf(ChatId)));
                 wordService.SaveWord(new Word(null, "journey", "путешествие", LocalDate.now().minusDays(31), null, String.valueOf(ChatId)));
@@ -99,7 +116,8 @@ public class Bot extends TelegramLongPollingBot {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } // Действие при команде /delete
+            }
+
             if(message.startsWith("/delete")) {
                 try {
                     SendMessage response = deleteWord.DeleteWord(message,ChatId);
@@ -108,6 +126,7 @@ public class Bot extends TelegramLongPollingBot {
                     throw new RuntimeException(e);
                 }
             }
+
             if (message.startsWith("/testButtons")) {
                 try {
                     wordRepository.updateAllDelayBetween(); // пусть остаётся, если нужно
@@ -133,16 +152,23 @@ public class Bot extends TelegramLongPollingBot {
 
                     InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
                     markup.setKeyboard(keyboard);
+                    SendAudio sendAudio = new SendAudio();
+                    InputStream stream = makeSound.makeSound("The sky turned dark and heavy, but light still found a way in.");
+                    sendAudio.setChatId(ChatId);
+                    sendAudio.setAudio(new InputFile(stream, "sound.mp3"));
+                    execute(sendAudio);
+
                     SendMessage sendMessage1 = new SendMessage();
-                    sendMessage1.setChatId(String.valueOf(7685744536L));
+                    sendMessage1.setChatId(ChatId);
                     sendMessage1.setText("Это тест. Выбери правильный ответ:");
                     sendMessage1.setReplyMarkup(markup);
 
-                    sender.send(sendMessage1);
+                    execute(sendMessage1);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
+
             if(message.startsWith("/testUpdate")){
                 try{
                     wordRepository.updateAllDelayBetween();
@@ -153,8 +179,10 @@ public class Bot extends TelegramLongPollingBot {
             if (message.startsWith("/list")) {
 
                 try {
-                    SendMessage responce = listWord.ListWords(String.valueOf(ChatId));
-                    execute(responce);
+                    List<SendMessage> messages = listWord.listWords(String.valueOf(ChatId));
+                    for (SendMessage msg : messages) {
+                        execute(msg);
+                    }
                 } catch (TelegramApiException e) {
                     throw new RuntimeException(e);
                 }

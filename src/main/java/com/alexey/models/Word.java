@@ -10,7 +10,8 @@ import java.time.Period;
 import java.time.temporal.ChronoUnit;
 
 @Entity
-@Table(name = "word")
+@Table(name = "word",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"word", "translation","user_id"}))
 public class Word {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -20,36 +20,41 @@ public class DeleteWord {
     private Bot bot;
 
     public SendMessage DeleteWord(String message, Long chatId) throws TelegramApiException {
-
-
-        Pattern pattern = Pattern.compile("\"([^\"]+)\"");
+        Pattern pattern = Pattern.compile("[\"“”]([^\"“”]+)[\"“”]");
         Matcher matcher = pattern.matcher(message);
 
         SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
 
-        // Проверяем, что в сообщении есть две строки в кавычках
         if (matcher.find()) {
-            String wordText = matcher.group(1);  // Первая строка в кавычках - слово
+            String wordText = matcher.group(1).trim();
             if (matcher.find()) {
-                String translationText = matcher.group(1);  // Вторая строка в кавычках - перевод
+                String translationText = matcher.group(1).trim();
 
-                // Проверяем, существует ли такая пара слово-перевод в базе
-                if (wordRepository.existsByWordAndTranslationAndUserId(wordText, translationText,String.valueOf(chatId))) {
-                    // Удаляем пару слово-перевод
-                    wordService.DeleteWord(wordText, translationText,String.valueOf(chatId));
-                    sendMessage.setChatId(chatId);
+
+                if (wordText.isEmpty() || translationText.isEmpty()) {
+                    sendMessage.setText("Слово и перевод не могут быть пустыми.");
+                    return sendMessage;
+                }
+
+
+                if (!wordText.matches("[a-zA-Zа-яА-ЯёЁ\\s()]+") || !translationText.matches("[a-zA-Zа-яА-ЯёЁ\\s()]+")) {
+                    sendMessage.setText("Слово и перевод могут содержать только буквы и пробелы.");
+                    return sendMessage;
+                }
+
+
+                if (wordRepository.existsByWordAndTranslationAndUserId(wordText, translationText, String.valueOf(chatId))) {
+                    wordService.DeleteWord(wordText, translationText, String.valueOf(chatId));
                     sendMessage.setText("Пара: \"" + wordText + "\" - \"" + translationText + "\" удалена!");
                     return sendMessage;
                 } else {
-                    sendMessage.setChatId(chatId);
-                    sendMessage.setText("Такой пары слово-перевод не существует! Возможно, она была удалена ранее.");
+                    sendMessage.setText("Такой пары слово-перевод не существует. Возможно, она уже была удалена.");
                     return sendMessage;
                 }
             }
         }
 
-        // Если не найдены две строки в кавычках
-        sendMessage.setChatId(chatId);
         sendMessage.setText("Введите команду по примеру: /delete \"слово\" \"перевод\"");
         return sendMessage;
     }

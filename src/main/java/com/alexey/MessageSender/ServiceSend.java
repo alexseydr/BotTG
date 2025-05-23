@@ -1,16 +1,21 @@
 package com.alexey.MessageSender;
 
 import com.alexey.repository.WordRepository;
+import com.alexey.service.MakeSound;
 import com.alexey.service.WordService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.InputStream;
 import java.util.*;
 
 @Service
@@ -18,14 +23,18 @@ public class ServiceSend {
 
     private final Sender sender;
     private final Schedule schedule;
+    private final MakeSound makeSound;
     private WordRepository wordRepository;
     private WordService wordService;
+    @Autowired
+    private MakeSound makeSoundService;
 
-    public ServiceSend(Sender sender, Schedule schedule, WordRepository wordRepository, WordService wordService) {
+    public ServiceSend(Sender sender, Schedule schedule, WordRepository wordRepository, WordService wordService, MakeSound makeSound) {
         this.sender = sender;
         this.schedule = schedule;
         this.wordRepository = wordRepository;
         this.wordService = wordService;
+        this.makeSound = makeSound;
     }
 
     public void getCallbackResponse(CallbackQuery callbackQuery) {
@@ -66,7 +75,7 @@ public class ServiceSend {
     }
 
 
-    @Scheduled(cron = "0 30 11 * * *")
+    @Scheduled(cron = "0 01 13 * * *")
     public void sendDailyMessage() {
         Map<Long, List<String>> messages = schedule.MessagingQueue();
         for (Map.Entry<Long, List<String>> entry : messages.entrySet()) {
@@ -108,8 +117,13 @@ public class ServiceSend {
                 SendMessage message = new SendMessage();
                 message.setChatId(userId.toString());
                 message.setText("Привет, выбери правильный перевод слова: \n" + userMessage.get(i));
+                SendAudio sendAudio = new SendAudio();
+                sendAudio.setChatId(userId.toString());
+                InputStream stream = makeSound.makeSound(userMessage.get(i));
+                sendAudio.setAudio(new InputFile(stream, userMessage.get(i) + ".mp3"));
 
                 try {
+                    sender.sendAudio(sendAudio);
                     message.setReplyMarkup(markup);
                     sender.send(message);
                 } catch (TelegramApiException e) {

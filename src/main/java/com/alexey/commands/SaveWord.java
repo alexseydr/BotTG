@@ -23,26 +23,33 @@ public class SaveWord {
 
     public SendMessage saveWord(String message, Long chatId, String userId) throws TelegramApiException {
 
-        // Регулярное выражение для поиска строк в кавычках
-        Pattern pattern = Pattern.compile("\"([^\"]+)\""); // Это ищет текст в кавычках
+
+        Pattern pattern = Pattern.compile("[\"“”]([^\"“”]+)[\"“”]"); // Это ищет текст в кавычках
         Matcher matcher = pattern.matcher(message);
 
         SendMessage sendMessage = new SendMessage();
         LocalDate date = LocalDate.now();
 
-        // Проверяем, что в сообщении есть две строки в кавычках
-        if (matcher.find()) {
-            String wordText = matcher.group(1);  // Первая строка в кавычках - слово
-            if (matcher.find()) {
-                String translationText = matcher.group(1);  // Вторая строка в кавычках - перевод
 
-                // Проверяем, существует ли такая пара слово-перевод в базе
+        if (matcher.find()) {
+            String wordText = matcher.group(1).trim();  // Первая строка в кавычках - слово
+            if (matcher.find()) {
+                String translationText = matcher.group(1).trim();  // Вторая строка в кавычках - перевод
+
+
+                if (!wordText.matches("[a-zA-Zа-яА-ЯёЁ\\s()]+") || !translationText.matches("[a-zA-Zа-яА-ЯёЁ\\s()]+")) {
+                    sendMessage.setChatId(chatId);
+                    sendMessage.setText("Слово и перевод могут содержать только буквы и пробелы.");
+                    return sendMessage;
+                }
+
+
                 if (wordRepository.existsByWordAndTranslationAndUserId(wordText, translationText, String.valueOf(chatId))) {
                     sendMessage.setChatId(chatId);
                     sendMessage.setText("Такая пара слово-перевод уже существует");
                     return sendMessage;
                 } else {
-                    // Сохраняем новое слово с переводом
+
                     wordService.SaveWord(new Word(null, wordText, translationText, date, null, userId));
                     sendMessage.setChatId(chatId);
                     sendMessage.setText("Пара \"" + wordText + "\" - \"" + translationText + "\" сохранена в словарь!");
@@ -51,7 +58,7 @@ public class SaveWord {
             }
         }
 
-        // Если не найдены две строки в кавычках
+
         sendMessage.setChatId(chatId);
         sendMessage.setText("Введите команду по примеру: /save \"слово\" \"перевод\"");
         return sendMessage;
